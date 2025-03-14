@@ -1,0 +1,90 @@
+
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import CarpoolMap from '@/components/CarpoolMap';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Car, Users, Leaf, Globe } from 'lucide-react';
+
+const CarpoolPage = () => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <div className="bg-ecotopia-primary text-white py-10">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Eco-Friendly Carpooling</h1>
+            <p className="max-w-3xl opacity-90">
+              Connect with fellow eco-conscious travelers to share rides, reduce emissions, 
+              and make your journey more sustainable and affordable.
+            </p>
+          </div>
+        </div>
+        
+        {/* Stats Section */}
+        <div className="py-8 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <Car className="h-10 w-10 text-ecotopia-primary mb-2" />
+                  <h3 className="text-2xl font-bold">15,240</h3>
+                  <p className="text-gray-600">Shared Rides</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <Users className="h-10 w-10 text-ecotopia-primary mb-2" />
+                  <h3 className="text-2xl font-bold">28,500</h3>
+                  <p className="text-gray-600">Active Users</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <Leaf className="h-10 w-10 text-ecotopia-primary mb-2" />
+                  <h3 className="text-2xl font-bold">320</h3>
+                  <p className="text-gray-600">Tons CO₂ Saved</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <Globe className="h-10 w-10 text-ecotopia-primary mb-2" />
+                  <h3 className="text-2xl font-bold">120</h3>
+                  <p className="text-gray-600">Destinations</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-2">Find or Offer a Ride</h2>
+            <p className="text-gray-600 mb-4">
+              Looking for a ride to your next eco-adventure? Find travelers headed your way or offer 
+              empty seats in your vehicle to help others reduce their carbon footprint.
+            </p>
+            <div className="flex gap-4">
+              <Button className="bg-ecotopia-primary hover:bg-ecotopia-light">
+                Find a Ride
+              </Button>
+              <Button variant="outline" className="border-ecotopia-primary text-ecotopia-primary">
+                Offer a Ride
+              </Button>
+            </div>
+          </div>
+          
+          <CarpoolMap />
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default CarpoolPage;
