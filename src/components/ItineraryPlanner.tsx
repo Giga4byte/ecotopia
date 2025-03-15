@@ -3,7 +3,27 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Search, MapPin, Calendar, Plus, Trash2, Leaf, Navigation, Car, Train, Bus, Plane } from 'lucide-react';
+import { Search, MapPin, Calendar, Plus, Trash2, Leaf, Navigation, Car, Train, Bus, Plane, Wallet, PiggyBank } from 'lucide-react';
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 // Carbon footprint constants (in kg CO2 per km)
 const CARBON_FOOTPRINT = {
@@ -370,12 +390,219 @@ const DestinationCard = ({
   );
 };
 
+// Price multipliers for non-eco options
+const NON_ECO_MULTIPLIERS = {
+  accommodation: 1.3,  // Non-eco accommodation costs 30% more
+  transport: 1.2,     // Non-eco transport costs 20% more
+  activities: 1.25    // Non-eco activities cost 25% more
+};
+
+interface BudgetInfo {
+  totalBudget: number;
+  spentAmount: number;
+}
+
+const BudgetAnalysis = ({ 
+  itinerary, 
+  destinations, 
+  sourceCity,
+  budgetInfo,
+  onBudgetUpdate
+}: { 
+  itinerary: ItineraryItem[];
+  destinations: Destination[];
+  sourceCity: string;
+  budgetInfo: BudgetInfo;
+  onBudgetUpdate: (field: keyof BudgetInfo, value: string) => void;
+}) => {
+  const calculateCosts = () => {
+    let ecoTotal = 0;
+    let nonEcoTotal = 0;
+
+    itinerary.forEach(item => {
+      const destination = destinations.find(d => d.id === item.destinationId);
+      if (!destination) return;
+
+      // Calculate accommodation costs
+      const ecoAccommodation = destination.priceRange === '$$$' ? 5000 : 
+                              destination.priceRange === '$$' ? 3000 : 2000;
+      const nonEcoAccommodation = ecoAccommodation * NON_ECO_MULTIPLIERS.accommodation;
+      
+      // Calculate transport costs
+      const source = stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity);
+      let transportCost = 0;
+      if (source) {
+        const distance = calculateDistance(
+          source.coordinates.lat,
+          source.coordinates.lng,
+          destination.coordinates.lat,
+          destination.coordinates.lng
+        );
+        
+        // Base transport costs per km
+        const transportRates = {
+          car: 12,
+          train: 2,
+          bus: 1.5,
+          plane: 8
+        };
+        
+        transportCost = distance * transportRates[item.transportMode];
+      }
+      const nonEcoTransport = transportCost * NON_ECO_MULTIPLIERS.transport;
+
+      // Calculate activity costs
+      const ecoActivities = 1000 * item.days;
+      const nonEcoActivities = ecoActivities * NON_ECO_MULTIPLIERS.activities;
+
+      ecoTotal += (ecoAccommodation * item.nights) + transportCost + ecoActivities;
+      nonEcoTotal += (nonEcoAccommodation * item.nights) + nonEcoTransport + nonEcoActivities;
+    });
+
+    return { ecoTotal, nonEcoTotal };
+  };
+
+  const { ecoTotal, nonEcoTotal } = calculateCosts();
+  const savings = nonEcoTotal - ecoTotal;
+  const ecoSavingsPercentage = ((savings / nonEcoTotal) * 100).toFixed(1);
+
+  const chartData = {
+    labels: ['Eco-Friendly', 'Traditional'],
+    datasets: [
+      {
+        label: 'Total Cost (₹)',
+        data: [ecoTotal, nonEcoTotal],
+        backgroundColor: [
+          'rgba(34, 197, 94, 0.5)',
+          'rgba(239, 68, 68, 0.5)',
+        ],
+        borderColor: [
+          'rgb(34, 197, 94)',
+          'rgb(239, 68, 68)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Cost Comparison: Eco vs Traditional Travel',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Cost (₹)',
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-6">
+        <CardHeader>
+          <CardTitle>Budget Overview</CardTitle>
+          <CardDescription>Track your eco-friendly travel savings</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-green-50 rounded-lg">
+              <h3 className="text-sm font-medium text-green-800">Total Budget</h3>
+              <div className="mt-2">
+                <Input
+                  type="number"
+                  value={budgetInfo.totalBudget}
+                  onChange={(e) => onBudgetUpdate('totalBudget', e.target.value)}
+                  placeholder="Enter your budget"
+                  className="text-2xl font-bold text-green-700"
+                />
+              </div>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="text-sm font-medium text-blue-800">Amount Spent</h3>
+              <div className="mt-2">
+                <Input
+                  type="number"
+                  value={budgetInfo.spentAmount}
+                  onChange={(e) => onBudgetUpdate('spentAmount', e.target.value)}
+                  placeholder="Enter amount spent"
+                  className="text-2xl font-bold text-blue-700"
+                />
+              </div>
+            </div>
+            <div className="p-4 bg-yellow-50 rounded-lg">
+              <h3 className="text-sm font-medium text-yellow-800">Remaining Budget</h3>
+              <p className="text-2xl font-bold text-yellow-700">
+                ₹{(budgetInfo.totalBudget - budgetInfo.spentAmount).toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="p-6 bg-green-100 rounded-lg">
+              <h3 className="text-lg font-semibold text-green-800 mb-2">Eco-Friendly Cost</h3>
+              <p className="text-3xl font-bold text-green-700">₹{ecoTotal.toLocaleString()}</p>
+            </div>
+            <div className="p-6 bg-red-100 rounded-lg">
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Traditional Cost</h3>
+              <p className="text-3xl font-bold text-red-700">₹{nonEcoTotal.toLocaleString()}</p>
+            </div>
+          </div>
+
+          <Card className="bg-emerald-50 border-emerald-200">
+            <CardHeader>
+              <CardTitle className="text-emerald-800">Your Eco-Savings</CardTitle>
+              <CardDescription className="text-emerald-600">
+                Amount saved by choosing eco-friendly options
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-4xl font-bold text-emerald-700">₹{savings.toLocaleString()}</p>
+                  <p className="text-sm text-emerald-600 mt-1">
+                    You're saving {ecoSavingsPercentage}% on your travel expenses!
+                  </p>
+                </div>
+                <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <PiggyBank className="h-8 w-8 text-emerald-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Cost Breakdown</h3>
+            <div className="h-80">
+              <Bar options={chartOptions} data={chartData} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 const ItineraryPlanner = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [destinations] = useState<Destination[]>(sampleDestinations);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [activeTab, setActiveTab] = useState('plan');
   const [sourceCity, setSourceCity] = useState('');
+  const [budgetInfo, setBudgetInfo] = useState<BudgetInfo>({
+    totalBudget: 0,
+    spentAmount: 0
+  });
   
   // Filter destinations based on distance from source city
   const getFilteredDestinations = () => {
@@ -481,13 +708,21 @@ const ItineraryPlanner = () => {
       return total + journeyCarbon + accommodationCarbon + activitiesCarbon;
     }, 0);
   };
-  
+
+  const handleBudgetUpdate = (field: keyof BudgetInfo, value: string) => {
+    setBudgetInfo(prev => ({
+      ...prev,
+      [field]: parseInt(value) || 0
+    }));
+  };
+
   return (
     <div>
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="plan">Plan Your Route</TabsTrigger>
           <TabsTrigger value="destinations">Sustainable Destinations</TabsTrigger>
+          <TabsTrigger value="budget">Budget Analysis</TabsTrigger>
         </TabsList>
         
         <TabsContent value="plan">
@@ -550,143 +785,49 @@ const ItineraryPlanner = () => {
           )}
         </TabsContent>
         
-        <TabsContent value="itinerary">
+        <TabsContent value="budget">
+          <Card className="p-6 mb-6">
+            <CardHeader>
+              <CardTitle>Set Your Budget</CardTitle>
+              <CardDescription>Enter your total budget and spent amount to track eco-savings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Total Budget (₹)</label>
+                  <Input
+                    type="number"
+                    value={budgetInfo.totalBudget}
+                    onChange={(e) => handleBudgetUpdate('totalBudget', e.target.value)}
+                    placeholder="Enter your budget"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Amount Spent (₹)</label>
+                  <Input
+                    type="number"
+                    value={budgetInfo.spentAmount}
+                    onChange={(e) => handleBudgetUpdate('spentAmount', e.target.value)}
+                    placeholder="Enter amount spent"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {itinerary.length > 0 ? (
-            <div className="space-y-4">
-              {itinerary
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map(item => {
-                  const destination = getDestinationById(item.destinationId);
-                  
-                  if (!destination) return null;
-                  
-                  return (
-                    <Card key={item.id} className="overflow-hidden">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/4 h-40 md:h-auto">
-                          <img 
-                            src={destination.image} 
-                            alt={destination.name} 
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="md:w-3/4 p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="text-xl font-semibold">{destination.name}</h3>
-                              <p className="text-gray-600 flex items-center">
-                                <MapPin size={14} className="mr-1" /> {destination.location}
-                              </p>
-                            </div>
-                            <Button 
-                              onClick={() => handleRemoveFromItinerary(item.id)}
-                              variant="outline"
-                              size="sm"
-                              className="text-red-500 border-red-200 hover:bg-red-50"
-                            >
-                              <Trash2 size={14} />
-                            </Button>
-                          </div>
-                          
-                          <div className="mb-3 flex items-center">
-                            <Calendar size={14} className="mr-1 text-gray-500" />
-                            <Input 
-                              type="date" 
-                              value={item.date} 
-                              onChange={(e) => handleUpdateDate(item.id, e.target.value)}
-                              className="w-44 h-8 text-sm"
-                            />
-                          </div>
-
-                          <div className="mb-3 flex items-center gap-4">
-                            <div className="flex items-center">
-                              <label className="text-sm mr-2">Transport:</label>
-                              <select
-                                value={item.transportMode}
-                                onChange={(e) => handleUpdateTransportMode(item.id, e.target.value as any)}
-                                className="text-sm border rounded p-1"
-                              >
-                                <option value="car">Car</option>
-                                <option value="train">Train</option>
-                                <option value="bus">Bus</option>
-                                <option value="plane">Plane</option>
-                              </select>
-                            </div>
-                            <div className="flex items-center">
-                              <label className="text-sm mr-2">Nights:</label>
-                              <Input
-                                type="number"
-                                min="1"
-                                value={item.nights}
-                                onChange={(e) => handleUpdateDuration(item.id, parseInt(e.target.value), item.days)}
-                                className="w-16 h-8 text-sm"
-                              />
-                            </div>
-                            <div className="flex items-center">
-                              <label className="text-sm mr-2">Days:</label>
-                              <Input
-                                type="number"
-                                min="1"
-                                value={item.days}
-                                onChange={(e) => handleUpdateDuration(item.id, item.nights, parseInt(e.target.value))}
-                                className="w-16 h-8 text-sm"
-                              />
-                            </div>
-                          </div>
-                          
-                          <Input
-                            placeholder="Add notes for this destination..."
-                            value={item.notes}
-                            onChange={(e) => handleUpdateNotes(item.id, e.target.value)}
-                            className="mb-2"
-                          />
-                          
-                          <div className="flex flex-wrap gap-2">
-                            {destination.features.map((feature, index) => (
-                              <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                                {feature}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                            <h4 className="text-sm font-medium text-green-800 mb-2">Carbon Footprint Breakdown:</h4>
-                            <div className="text-sm text-green-700">
-                              <p>Accommodation: {Math.round(destination.carbonFootprint.accommodation * item.nights)} kg CO2</p>
-                              <p>Activities: {Math.round(destination.carbonFootprint.activities * item.days)} kg CO2</p>
-                              <p>Transport: {Math.round(calculateJourneyCarbon(
-                                calculateDistance(
-                                  stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity)?.coordinates.lat || 0,
-                                  stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity)?.coordinates.lng || 0,
-                                  destination.coordinates.lat,
-                                  destination.coordinates.lng
-                                ),
-                                item.transportMode
-                              ))} kg CO2</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              
-              <div className="mt-6 p-4 bg-green-100 rounded-lg">
-                <h3 className="text-lg font-semibold text-green-800 mb-2">Total Carbon Footprint</h3>
-                <p className="text-2xl font-bold text-green-700">
-                  {Math.round(calculateTotalCarbonFootprint())} kg CO2
-                </p>
-              </div>
-
-              <div className="flex justify-end mt-6">
-                <Button className="bg-ecotopia-primary hover:bg-ecotopia-light">
-                  Save Itinerary
-                </Button>
-              </div>
-            </div>
+            <BudgetAnalysis
+              itinerary={itinerary}
+              destinations={destinations}
+              sourceCity={sourceCity}
+              budgetInfo={budgetInfo}
+              onBudgetUpdate={handleBudgetUpdate}
+            />
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">Your itinerary is empty. Add some eco-friendly destinations!</p>
+              <p className="text-gray-500 mb-4">Add destinations to your itinerary to see cost comparisons!</p>
               <Button 
                 onClick={() => setActiveTab('destinations')}
                 className="bg-ecotopia-primary hover:bg-ecotopia-light"
