@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -74,7 +73,7 @@ const BudgetTracker = () => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Budget Overview</span>
-            <span className="text-lg font-normal">${totalBudget} total budget</span>
+            <span className="text-lg font-normal">₹{totalBudget} total budget</span>
           </CardTitle>
           <CardDescription>Track your spending and eco-impact</CardDescription>
         </CardHeader>
@@ -86,7 +85,7 @@ const BudgetTracker = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Spent</p>
-                <p className="text-2xl font-bold text-gray-800">${totalSpent}</p>
+                <p className="text-2xl font-bold text-gray-800">₹{totalSpent}</p>
               </div>
             </div>
             
@@ -96,7 +95,7 @@ const BudgetTracker = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Remaining</p>
-                <p className="text-2xl font-bold text-gray-800">${remaining}</p>
+                <p className="text-2xl font-bold text-gray-800">₹{remaining}</p>
               </div>
             </div>
             
@@ -106,7 +105,7 @@ const BudgetTracker = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Eco-savings</p>
-                <p className="text-2xl font-bold text-gray-800">$85</p>
+                <p className="text-2xl font-bold text-gray-800">₹85</p>
               </div>
             </div>
           </div>
@@ -134,7 +133,7 @@ const BudgetTracker = () => {
                         />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `$${value}`} />
+                    <Tooltip formatter={(value) => `₹${value}`} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -147,7 +146,7 @@ const BudgetTracker = () => {
                   <BarChart data={barData}>
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip formatter={(value) => `$${value}`} />
+                    <Tooltip formatter={(value) => `₹${value}`} />
                     <Legend />
                     <Bar dataKey="eco" name="Eco-friendly" fill="#2E7D32" />
                     <Bar dataKey="nonEco" name="Traditional" fill="#FF5722" />
@@ -182,7 +181,7 @@ const BudgetTracker = () => {
                   <tr key={expense.id} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4">{expense.category}</td>
                     <td className="py-3 px-4">{expense.date}</td>
-                    <td className="py-3 px-4">${expense.amount}</td>
+                    <td className="py-3 px-4">₹{expense.amount}</td>
                     <td className="py-3 px-4">
                       <EcoRatingBadge rating={expense.ecoRating} />
                     </td>

@@ -124,9 +124,9 @@ class CarpoolService {
   }
 
   private calculatePrice(distanceInMeters: number): number {
-    // Basic price calculation: $1 per km with a minimum of $5
-    const pricePerKm = 1;
-    const minimumPrice = 5;
+    // Basic price calculation: ₹75 per km with a minimum of ₹375
+    const pricePerKm = 75;
+    const minimumPrice = 375;
     const distanceInKm = distanceInMeters / 1000;
     return Math.max(minimumPrice, Math.round(distanceInKm * pricePerKm));
   }

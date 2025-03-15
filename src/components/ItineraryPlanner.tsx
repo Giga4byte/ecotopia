@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -10,33 +9,53 @@ import { Search, MapPin, Calendar, Plus, Trash2, Leaf } from 'lucide-react';
 const sampleDestinations = [
   {
     id: 1,
-    name: 'Costa Rica Eco Lodge',
-    location: 'Monteverde, Costa Rica',
-    description: 'Sustainable lodge in the cloud forest with renewable energy and conservation programs.',
-    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
+    name: 'Spiti Valley Eco Lodge',
+    location: 'Spiti Valley, Himachal Pradesh',
+    description: 'Solar-powered mountain lodge promoting sustainable tourism in the Trans-Himalayas. Experience traditional Spitian culture and snow leopard conservation.',
+    image: 'https://images.unsplash.com/photo-1506038634487-60a69ae4b7b1',
     ecoRating: 9.5,
-    features: ['Solar Powered', 'Rainwater Harvesting', 'Farm-to-Table Dining'],
-    priceRange: '$$$'
+    features: ['Solar Powered', 'Local Community Support', 'Wildlife Conservation'],
+    priceRange: '₹₹₹ (₹12,000 - ₹15,000/night)'
   },
   {
     id: 2,
-    name: 'Tasmania Wilderness Retreat',
-    location: 'Cradle Mountain, Tasmania',
-    description: 'Off-grid cabins with minimal environmental impact in pristine wilderness.',
-    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07',
-    ecoRating: 8.8,
-    features: ['Carbon Neutral', 'Wildlife Conservation', 'Organic Gardens'],
-    priceRange: '$$'
+    name: 'Kabini Forest Retreat',
+    location: 'Nagarhole National Park, Karnataka',
+    description: 'Eco-friendly wildlife resort at the edge of Nagarhole Tiger Reserve. Features rainwater harvesting and organic farming.',
+    image: 'https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9',
+    ecoRating: 9.2,
+    features: ['Organic Farm', 'Tiger Conservation', 'Local Employment'],
+    priceRange: '₹₹ (₹8,000 - ₹10,000/night)'
   },
   {
     id: 3,
-    name: 'Norwegian Fjord Eco-Camp',
-    location: 'Geirangerfjord, Norway',
-    description: 'Sustainable glamping experience with spectacular fjord views and zero-waste policy.',
-    image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21',
-    ecoRating: 9.2,
-    features: ['Zero Waste', 'Local Guides', 'Renewable Energy'],
-    priceRange: '$$'
+    name: 'Sundarbans Eco Village',
+    location: 'Sundarbans, West Bengal',
+    description: 'Sustainable cottages in the world\'s largest mangrove forest. Supporting tiger conservation and local communities.',
+    image: 'https://images.unsplash.com/photo-1499678329028-101435549a4e',
+    ecoRating: 8.8,
+    features: ['Zero Waste', 'Mangrove Conservation', 'Local Guides'],
+    priceRange: '₹₹ (₹6,000 - ₹8,000/night)'
+  },
+  {
+    id: 4,
+    name: 'Coorg Coffee Estate Stay',
+    location: 'Coorg, Karnataka',
+    description: 'Sustainable coffee plantation stay with organic farming practices and bird watching. Experience the authentic coffee culture.',
+    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
+    ecoRating: 9.0,
+    features: ['Organic Coffee', 'Bird Sanctuary', 'Farm-to-Table'],
+    priceRange: '₹₹ (₹7,000 - ₹9,000/night)'
+  },
+  {
+    id: 5,
+    name: 'Rann of Kutch Desert Camp',
+    location: 'Great Rann of Kutch, Gujarat',
+    description: 'Eco-friendly desert camp using renewable energy, supporting local artisans and desert conservation.',
+    image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e',
+    ecoRating: 8.9,
+    features: ['Solar Power', 'Artisan Support', 'Desert Conservation'],
+    priceRange: '₹₹₹ (₹10,000 - ₹12,000/night)'
   }
 ];
 
