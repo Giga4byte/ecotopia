@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,8 @@ const sampleRides = [
       name: 'Alex Thompson',
       rating: 4.8,
       rides: 26,
-      avatar: 'https://i.pravatar.cc/150?img=3'
+      avatar: 'https://i.pravatar.cc/150?img=3',
+      gender: 'female'
     },
     from: 'San Francisco, CA',
     to: 'Yosemite National Park, CA',
@@ -32,7 +32,8 @@ const sampleRides = [
       name: 'Maya Rodriguez',
       rating: 4.9,
       rides: 42,
-      avatar: 'https://i.pravatar.cc/150?img=5'
+      avatar: 'https://i.pravatar.cc/150?img=5',
+      gender: 'female'
     },
     from: 'Portland, OR',
     to: 'Cannon Beach, OR',
@@ -50,7 +51,8 @@ const sampleRides = [
       name: 'David Chen',
       rating: 4.7,
       rides: 15,
-      avatar: 'https://i.pravatar.cc/150?img=12'
+      avatar: 'https://i.pravatar.cc/150?img=12',
+      gender: 'male'
     },
     from: 'Seattle, WA',
     to: 'Olympic National Park, WA',
@@ -74,14 +76,16 @@ const CarpoolMap = () => {
   const [searchFrom, setSearchFrom] = useState('');
   const [searchTo, setSearchTo] = useState('');
   const [searchDate, setSearchDate] = useState('');
+  const [womenOnly, setWomenOnly] = useState(false);
   const [availableRides, setAvailableRides] = useState(sampleRides);
   
   const filteredRides = availableRides.filter(ride => {
     const matchFrom = searchFrom === '' || ride.from.toLowerCase().includes(searchFrom.toLowerCase());
     const matchTo = searchTo === '' || ride.to.toLowerCase().includes(searchTo.toLowerCase());
     const matchDate = searchDate === '' || ride.date === searchDate;
+    const matchGender = !womenOnly || ride.driver.gender === 'female';
     
-    return matchFrom && matchTo && matchDate;
+    return matchFrom && matchTo && matchDate && matchGender;
   });
   
   return (
@@ -116,6 +120,18 @@ const CarpoolMap = () => {
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="womenOnly"
+              checked={womenOnly}
+              onChange={(e) => setWomenOnly(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-ecotopia-primary focus:ring-ecotopia-light"
+            />
+            <label htmlFor="womenOnly" className="text-sm font-medium text-gray-700">
+              Women drivers only
+            </label>
           </div>
           <Button className="w-full bg-ecotopia-primary hover:bg-ecotopia-light">
             Search Rides
