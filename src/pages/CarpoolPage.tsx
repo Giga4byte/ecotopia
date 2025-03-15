@@ -61,7 +61,7 @@ const CarpoolPage = () => {
                   <h3 className="text-2xl font-bold">320</h3>
                   <p className="text-gray-600">Tons CO₂ Saved</p>
                 </CardContent>
-              </Card>
+              </Card> 
               
               <Card>
                 <CardContent className="p-6 flex flex-col items-center text-center">
