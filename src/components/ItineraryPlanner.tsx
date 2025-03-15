@@ -84,8 +84,8 @@ const sampleDestinations = [
     priceRange: '$$',
     coordinates: { lat: 31.1048, lng: 77.5696 },
     carbonFootprint: {
-      accommodation: 15, // kg CO2 per night
-      activities: 5,   // kg CO2 per day
+      accommodation: 15,
+      activities: 5,
     }
   },
   {
@@ -99,8 +99,8 @@ const sampleDestinations = [
     priceRange: '$$',
     coordinates: { lat: 16.5062, lng: 80.6480 },
     carbonFootprint: {
-      accommodation: 10, // kg CO2 per night
-      activities: 3,   // kg CO2 per day
+      accommodation: 10,
+      activities: 3,
     }
   },
   {
@@ -114,8 +114,8 @@ const sampleDestinations = [
     priceRange: '$$$',
     coordinates: { lat: 11.4035, lng: 76.7070 },
     carbonFootprint: {
-      accommodation: 25, // kg CO2 per night
-      activities: 12,   // kg CO2 per day
+      accommodation: 25,
+      activities: 12,
     }
   },
   {
@@ -129,8 +129,53 @@ const sampleDestinations = [
     priceRange: '$$',
     coordinates: { lat: 11.6667, lng: 75.8833 },
     carbonFootprint: {
-      accommodation: 10, // kg CO2 per night
-      activities: 5,   // kg CO2 per day
+      accommodation: 10,
+      activities: 5,
+    }
+  },
+  {
+    id: 6,
+    name: 'Sundarbans Eco Resort',
+    location: 'Sundarbans, West Bengal',
+    description: 'Eco-friendly resort in the world\'s largest mangrove forest, focusing on wildlife conservation.',
+    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7',
+    ecoRating: 8.7,
+    features: ['Mangrove Conservation', 'Solar Energy', 'Local Community', 'Wildlife Protection'],
+    priceRange: '$$',
+    coordinates: { lat: 21.9497, lng: 88.9401 },
+    carbonFootprint: {
+      accommodation: 12,
+      activities: 4,
+    }
+  },
+  {
+    id: 7,
+    name: 'Ranthambore Eco Lodge',
+    location: 'Ranthambore, Rajasthan',
+    description: 'Sustainable wildlife lodge near Ranthambore National Park with focus on tiger conservation.',
+    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7',
+    ecoRating: 8.9,
+    features: ['Wildlife Conservation', 'Solar Power', 'Water Recycling', 'Local Employment'],
+    priceRange: '$$$',
+    coordinates: { lat: 26.0195, lng: 76.4544 },
+    carbonFootprint: {
+      accommodation: 18,
+      activities: 8,
+    }
+  },
+  {
+    id: 8,
+    name: 'Himalayan Eco Retreat',
+    location: 'Manali, Himachal Pradesh',
+    description: 'Sustainable mountain retreat with organic farming and traditional architecture.',
+    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7',
+    ecoRating: 8.6,
+    features: ['Mountain Architecture', 'Organic Farming', 'Solar Heating', 'Waste Management'],
+    priceRange: '$$',
+    coordinates: { lat: 32.2432, lng: 77.1892 },
+    carbonFootprint: {
+      accommodation: 15,
+      activities: 6,
     }
   }
 ];
