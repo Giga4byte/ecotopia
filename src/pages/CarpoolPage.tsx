@@ -1,12 +1,25 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CarpoolMap from '@/components/CarpoolMap';
+import RideSearchForm from '@/components/RideSearchForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Car, Users, Leaf, Globe } from 'lucide-react';
+import { useState } from 'react';
+import { type Location, type MatchedRide } from '@/services/carpoolService';
 
 const CarpoolPage = () => {
+  const [activeTab, setActiveTab] = useState<'find' | 'offer'>('find');
+  const [startLocation, setStartLocation] = useState<Location>();
+  const [endLocation, setEndLocation] = useState<Location>();
+  const [matches, setMatches] = useState<MatchedRide[]>([]);
+
+  const handleLocationsChange = (start?: Location, end?: Location, newMatches?: MatchedRide[]) => {
+    setStartLocation(start);
+    setEndLocation(end);
+    setMatches(newMatches || []);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -48,7 +61,7 @@ const CarpoolPage = () => {
                   <h3 className="text-2xl font-bold">320</h3>
                   <p className="text-gray-600">Tons CO₂ Saved</p>
                 </CardContent>
-              </Card>
+              </Card> 
               
               <Card>
                 <CardContent className="p-6 flex flex-col items-center text-center">
@@ -64,22 +77,41 @@ const CarpoolPage = () => {
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-2">Find or Offer a Ride</h2>
-            <p className="text-gray-600 mb-4">
-              Looking for a ride to your next eco-adventure? Find travelers headed your way or offer 
-              empty seats in your vehicle to help others reduce their carbon footprint.
-            </p>
-            <div className="flex gap-4">
-              <Button className="bg-ecotopia-primary hover:bg-ecotopia-light">
+            <h2 className="text-2xl font-bold mb-4">Find or Offer a Ride</h2>
+            <div className="flex gap-4 mb-6">
+              <Button
+                className={`${
+                  activeTab === 'find'
+                    ? 'bg-ecotopia-primary text-white'
+                    : 'bg-white text-ecotopia-primary border-ecotopia-primary'
+                } border`}
+                onClick={() => setActiveTab('find')}
+              >
                 Find a Ride
               </Button>
-              <Button variant="outline" className="border-ecotopia-primary text-ecotopia-primary">
+              <Button
+                className={`${
+                  activeTab === 'offer'
+                    ? 'bg-ecotopia-primary text-white'
+                    : 'bg-white text-ecotopia-primary border-ecotopia-primary'
+                } border`}
+                onClick={() => setActiveTab('offer')}
+              >
                 Offer a Ride
               </Button>
             </div>
+            
+            <RideSearchForm 
+              type={activeTab}
+              onLocationsChange={handleLocationsChange}
+            />
           </div>
           
-          <CarpoolMap />
+          <CarpoolMap
+            startLocation={startLocation}
+            endLocation={endLocation}
+            matches={matches}
+          />
         </div>
       </main>
       <Footer />

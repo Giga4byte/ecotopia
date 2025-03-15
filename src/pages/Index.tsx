@@ -1,4 +1,3 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
@@ -82,7 +81,7 @@ const Index = () => {
                   Plan Your Eco-Trip
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-white text-white hover:bg-white hover:text-ecotopia-dark text-lg px-8 py-6">
+              <Button asChild variant="outline" className="border-white bg-transparent text-ecotopia-primary hover:bg-transparent text-lg px-8 py-6">
                 <Link to="/carpool">
                   Find Shared Rides
                 </Link>
