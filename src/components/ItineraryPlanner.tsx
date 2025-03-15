@@ -1,44 +1,194 @@
-
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Search, MapPin, Calendar, Plus, Trash2, Leaf } from 'lucide-react';
+import { Search, MapPin, Calendar, Plus, Trash2, Leaf, Navigation, Car, Train, Bus, Plane } from 'lucide-react';
 
-// Sample data for destinations
+// Carbon footprint constants (in kg CO2 per km)
+const CARBON_FOOTPRINT = {
+  car: 0.2,    // Average car
+  train: 0.04, // Electric train
+  bus: 0.08,   // Intercity bus
+  plane: 0.2   // Domestic flight
+};
+
+// Sample data for state capitals with coordinates
+const stateCapitals = [
+  // States
+  { id: 1, name: 'Hyderabad', state: 'Andhra Pradesh', coordinates: { lat: 17.3850, lng: 78.4867 } },
+  { id: 2, name: 'Itanagar', state: 'Arunachal Pradesh', coordinates: { lat: 27.0844, lng: 93.6053 } },
+  { id: 3, name: 'Dispur', state: 'Assam', coordinates: { lat: 26.1433, lng: 91.7898 } },
+  { id: 4, name: 'Patna', state: 'Bihar', coordinates: { lat: 25.5941, lng: 85.1376 } },
+  { id: 5, name: 'Raipur', state: 'Chhattisgarh', coordinates: { lat: 21.2514, lng: 81.6296 } },
+  { id: 6, name: 'Panaji', state: 'Goa', coordinates: { lat: 15.4989, lng: 73.8278 } },
+  { id: 7, name: 'Gandhinagar', state: 'Gujarat', coordinates: { lat: 23.2173, lng: 72.6810 } },
+  { id: 8, name: 'Chandigarh', state: 'Haryana', coordinates: { lat: 30.7333, lng: 76.7794 } },
+  { id: 9, name: 'Shimla', state: 'Himachal Pradesh', coordinates: { lat: 31.1048, lng: 77.1734 } },
+  { id: 10, name: 'Ranchi', state: 'Jharkhand', coordinates: { lat: 23.3441, lng: 85.3096 } },
+  { id: 11, name: 'Bengaluru', state: 'Karnataka', coordinates: { lat: 12.9716, lng: 77.5946 } },
+  { id: 12, name: 'Thiruvananthapuram', state: 'Kerala', coordinates: { lat: 8.5241, lng: 76.9366 } },
+  { id: 13, name: 'Bhopal', state: 'Madhya Pradesh', coordinates: { lat: 23.2599, lng: 77.4126 } },
+  { id: 14, name: 'Mumbai', state: 'Maharashtra', coordinates: { lat: 19.0760, lng: 72.8777 } },
+  { id: 15, name: 'Imphal', state: 'Manipur', coordinates: { lat: 24.8170, lng: 93.9368 } },
+  { id: 16, name: 'Shillong', state: 'Meghalaya', coordinates: { lat: 25.5788, lng: 91.8933 } },
+  { id: 17, name: 'Aizawl', state: 'Mizoram', coordinates: { lat: 23.7271, lng: 92.7176 } },
+  { id: 18, name: 'Kohima', state: 'Nagaland', coordinates: { lat: 25.6751, lng: 94.1080 } },
+  { id: 19, name: 'Bhubaneswar', state: 'Odisha', coordinates: { lat: 20.2961, lng: 85.8245 } },
+  { id: 20, name: 'Chandigarh', state: 'Punjab', coordinates: { lat: 30.7333, lng: 76.7794 } },
+  { id: 21, name: 'Jaipur', state: 'Rajasthan', coordinates: { lat: 26.9124, lng: 75.7873 } },
+  { id: 22, name: 'Gangtok', state: 'Sikkim', coordinates: { lat: 27.3314, lng: 88.6138 } },
+  { id: 23, name: 'Chennai', state: 'Tamil Nadu', coordinates: { lat: 13.0827, lng: 80.2707 } },
+  { id: 24, name: 'Hyderabad', state: 'Telangana', coordinates: { lat: 17.3850, lng: 78.4867 } },
+  { id: 25, name: 'Agartala', state: 'Tripura', coordinates: { lat: 23.8315, lng: 91.2868 } },
+  { id: 26, name: 'Lucknow', state: 'Uttar Pradesh', coordinates: { lat: 26.8467, lng: 80.9462 } },
+  { id: 27, name: 'Dehradun', state: 'Uttarakhand', coordinates: { lat: 30.3165, lng: 78.0322 } },
+  { id: 28, name: 'Kolkata', state: 'West Bengal', coordinates: { lat: 22.5726, lng: 88.3639 } },
+  { id: 29, name: 'Ranchi', state: 'Jharkhand', coordinates: { lat: 23.3441, lng: 85.3096 } },
+  
+  // Union Territories
+  { id: 30, name: 'Port Blair', state: 'Andaman and Nicobar Islands', coordinates: { lat: 11.6234, lng: 92.7265 } },
+  { id: 31, name: 'Chandigarh', state: 'Chandigarh', coordinates: { lat: 30.7333, lng: 76.7794 } },
+  { id: 32, name: 'Silvassa', state: 'Dadra and Nagar Haveli and Daman and Diu', coordinates: { lat: 20.2734, lng: 72.9927 } },
+  { id: 33, name: 'Delhi', state: 'Delhi', coordinates: { lat: 28.6139, lng: 77.2090 } },
+  { id: 34, name: 'Kavaratti', state: 'Lakshadweep', coordinates: { lat: 10.5626, lng: 72.6369 } },
+  { id: 35, name: 'Leh', state: 'Ladakh', coordinates: { lat: 34.1526, lng: 77.5771 } },
+  { id: 36, name: 'Srinagar', state: 'Jammu and Kashmir', coordinates: { lat: 34.0837, lng: 74.7973 } }
+];
+
+// Sample data for destinations with coordinates
 const sampleDestinations = [
   {
     id: 1,
-    name: 'Costa Rica Eco Lodge',
-    location: 'Monteverde, Costa Rica',
-    description: 'Sustainable lodge in the cloud forest with renewable energy and conservation programs.',
-    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
+    name: 'Dune Eco Village & Spa',
+    location: 'Puducherry, Tamil Nadu',
+    description: 'Beachfront eco-resort with solar power, organic farming, and sustainable architecture.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
     ecoRating: 9.5,
-    features: ['Solar Powered', 'Rainwater Harvesting', 'Farm-to-Table Dining'],
-    priceRange: '$$$'
+    features: ['Solar Powered', 'Organic Farm', 'Zero Waste', 'Rainwater Harvesting'],
+    priceRange: '$$$',
+    coordinates: { lat: 11.9139, lng: 79.8145 },
+    carbonFootprint: {
+      accommodation: 15,
+      activities: 5
+    }
   },
   {
     id: 2,
-    name: 'Tasmania Wilderness Retreat',
-    location: 'Cradle Mountain, Tasmania',
-    description: 'Off-grid cabins with minimal environmental impact in pristine wilderness.',
-    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07',
-    ecoRating: 8.8,
-    features: ['Carbon Neutral', 'Wildlife Conservation', 'Organic Gardens'],
-    priceRange: '$$'
+    name: 'Spiti Ecosphere',
+    location: 'Spiti Valley, Himachal Pradesh',
+    description: 'High-altitude sustainable tourism initiative with solar-powered homestays and local community engagement.',
+    image: 'https://images.unsplash.com/photo-1626628241026-3f5a2ac69a05',
+    ecoRating: 9.2,
+    features: ['Solar Energy', 'Local Community', 'Waste Management', 'Traditional Architecture'],
+    priceRange: '$$',
+    coordinates: { lat: 32.2432, lng: 78.0332 },
+    carbonFootprint: {
+      accommodation: 12,
+      activities: 4
+    }
   },
   {
     id: 3,
-    name: 'Norwegian Fjord Eco-Camp',
-    location: 'Geirangerfjord, Norway',
-    description: 'Sustainable glamping experience with spectacular fjord views and zero-waste policy.',
-    image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21',
-    ecoRating: 9.2,
-    features: ['Zero Waste', 'Local Guides', 'Renewable Energy'],
-    priceRange: '$$'
+    name: 'Bamboo House India',
+    location: 'Vishakhapatnam, Andhra Pradesh',
+    description: 'Innovative bamboo architecture with sustainable living practices and eco-tourism activities.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 9.0,
+    features: ['Bamboo Architecture', 'Eco Tourism', 'Local Crafts', 'Organic Food'],
+    priceRange: '$$',
+    coordinates: { lat: 17.6868, lng: 83.2185 },
+    carbonFootprint: {
+      accommodation: 10,
+      activities: 3
+    }
+  },
+  {
+    id: 4,
+    name: 'The Blue Mountains Resort',
+    location: 'Ooty, Tamil Nadu',
+    description: 'Heritage property with modern sustainability practices and organic gardens.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 8.8,
+    features: ['Heritage Conservation', 'Organic Gardens', 'Energy Efficiency', 'Water Conservation'],
+    priceRange: '$$$',
+    coordinates: { lat: 11.4102, lng: 76.6950 },
+    carbonFootprint: {
+      accommodation: 18,
+      activities: 6
+    }
+  },
+  {
+    id: 5,
+    name: 'Eco Camp Kerala',
+    location: 'Wayanad, Kerala',
+    description: 'Sustainable camping experience in the Western Ghats with minimal environmental impact.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 9.3,
+    features: ['Eco Camping', 'Wildlife Conservation', 'Local Culture', 'Adventure Activities'],
+    priceRange: '$$',
+    coordinates: { lat: 11.6854, lng: 76.1320 },
+    carbonFootprint: {
+      accommodation: 8,
+      activities: 4
+    }
+  },
+  {
+    id: 6,
+    name: 'Sundarbans Eco Resort',
+    location: 'Sundarbans, West Bengal',
+    description: 'Eco-friendly resort in the mangrove forests with sustainable tourism practices.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 8.9,
+    features: ['Mangrove Conservation', 'Solar Power', 'Local Community', 'Wildlife Tours'],
+    priceRange: '$$',
+    coordinates: { lat: 21.9497, lng: 88.9401 },
+    carbonFootprint: {
+      accommodation: 14,
+      activities: 5
+    }
+  },
+  {
+    id: 7,
+    name: 'Ranthambore Eco Lodge',
+    location: 'Ranthambore, Rajasthan',
+    description: 'Sustainable wildlife lodge with solar power and water conservation systems.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 8.7,
+    features: ['Wildlife Conservation', 'Solar Energy', 'Water Recycling', 'Local Artisans'],
+    priceRange: '$$$',
+    coordinates: { lat: 26.0167, lng: 76.5000 },
+    carbonFootprint: {
+      accommodation: 16,
+      activities: 6
+    }
+  },
+  {
+    id: 8,
+    name: 'Himalayan Eco Retreat',
+    location: 'Manali, Himachal Pradesh',
+    description: 'Mountain retreat with sustainable practices and adventure activities.',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+    ecoRating: 8.6,
+    features: ['Mountain Sustainability', 'Adventure Tourism', 'Local Culture', 'Organic Food'],
+    priceRange: '$$',
+    coordinates: { lat: 32.2432, lng: 77.1892 },
+    carbonFootprint: {
+      accommodation: 13,
+      activities: 5
+    }
   }
 ];
+
+interface City {
+  id: number;
+  name: string;
+  state: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}
 
 interface Destination {
   id: number;
@@ -49,6 +199,14 @@ interface Destination {
   ecoRating: number;
   features: string[];
   priceRange: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  carbonFootprint: {
+    accommodation: number; // kg CO2 per night
+    activities: number;   // kg CO2 per day
+  };
 }
 
 interface ItineraryItem {
@@ -56,15 +214,100 @@ interface ItineraryItem {
   destinationId: number;
   date: string;
   notes: string;
+  transportMode: 'car' | 'train' | 'bus' | 'plane';
+  nights: number;
+  days: number;
 }
+
+// Calculate distance between two points using Haversine formula
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
+// Calculate carbon footprint for a journey
+const calculateJourneyCarbon = (
+  distance: number,
+  transportMode: 'car' | 'train' | 'bus' | 'plane',
+  passengers: number = 1
+): number => {
+  return (distance * CARBON_FOOTPRINT[transportMode]) / passengers;
+};
+
+const CitySelector = ({ 
+  label, 
+  value, 
+  onChange 
+}: { 
+  label: string; 
+  value: string; 
+  onChange: (value: string) => void;
+}) => {
+  return (
+    <div className="flex flex-col space-y-2">
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full p-2 border rounded-md"
+      >
+        <option value="">Select a capital city</option>
+        {stateCapitals.map(city => (
+          <option key={city.id} value={`${city.name}, ${city.state}`}>
+            {city.name}, {city.state}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 const DestinationCard = ({ 
   destination, 
-  onAddToItinerary 
+  onAddToItinerary,
+  sourceCity
 }: { 
   destination: Destination; 
   onAddToItinerary: (destination: Destination) => void;
+  sourceCity: string;
 }) => {
+  const source = stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity);
+  
+  let distance = 0;
+  if (source) {
+    distance = calculateDistance(
+      source.coordinates.lat,
+      source.coordinates.lng,
+      destination.coordinates.lat,
+      destination.coordinates.lng
+    );
+  }
+
+  // Calculate sustainable transport options based on distance
+  const getSustainableTransportOptions = (distance: number) => {
+    const options = [];
+    if (distance < 300) {
+      options.push({ mode: 'train', carbon: calculateJourneyCarbon(distance, 'train') });
+      options.push({ mode: 'bus', carbon: calculateJourneyCarbon(distance, 'bus') });
+    }
+    if (distance < 100) {
+      options.push({ mode: 'car', carbon: calculateJourneyCarbon(distance, 'car') });
+    }
+    if (distance > 500) {
+      options.push({ mode: 'plane', carbon: calculateJourneyCarbon(distance, 'plane') });
+    }
+    return options.sort((a, b) => a.carbon - b.carbon);
+  };
+
+  const transportOptions = getSustainableTransportOptions(distance);
+
   return (
     <Card className="overflow-hidden h-full flex flex-col">
       <div className="relative h-48">
@@ -94,6 +337,26 @@ const DestinationCard = ({
           ))}
         </div>
         <p className="text-sm text-gray-500">Price range: {destination.priceRange}</p>
+        {distance > 0 && (
+          <div className="mt-2 text-sm text-gray-600">
+            <p>Distance: {Math.round(distance)} km</p>
+            <div className="mt-2">
+              <p className="font-medium text-green-700">Sustainable Transport Options:</p>
+              <ul className="mt-1 space-y-1">
+                {transportOptions.map((option, index) => (
+                  <li key={index} className="flex items-center">
+                    {option.mode === 'train' && <Train size={14} className="mr-1" />}
+                    {option.mode === 'bus' && <Bus size={14} className="mr-1" />}
+                    {option.mode === 'car' && <Car size={14} className="mr-1" />}
+                    {option.mode === 'plane' && <Plane size={14} className="mr-1" />}
+                    {option.mode.charAt(0).toUpperCase() + option.mode.slice(1)}: {Math.round(option.carbon)} kg CO2
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-2">Accommodation footprint: {Math.round(destination.carbonFootprint.accommodation)} kg CO2/night</p>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="pt-0">
         <Button 
@@ -111,9 +374,37 @@ const ItineraryPlanner = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [destinations] = useState<Destination[]>(sampleDestinations);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
-  const [activeTab, setActiveTab] = useState('destinations');
+  const [activeTab, setActiveTab] = useState('plan');
+  const [sourceCity, setSourceCity] = useState('');
   
-  const filteredDestinations = destinations.filter(destination => 
+  // Filter destinations based on distance from source city
+  const getFilteredDestinations = () => {
+    if (!sourceCity) return destinations;
+    
+    const source = stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity);
+    if (!source) return destinations;
+
+    return destinations
+      .map(dest => ({
+        ...dest,
+        distance: calculateDistance(
+          source.coordinates.lat,
+          source.coordinates.lng,
+          dest.coordinates.lat,
+          dest.coordinates.lng
+        )
+      }))
+      .filter(dest => dest.distance <= 1000) // Show destinations within 1000km
+      .sort((a, b) => {
+        // Sort by eco rating first, then by distance
+        if (b.ecoRating !== a.ecoRating) {
+          return b.ecoRating - a.ecoRating;
+        }
+        return a.distance - b.distance;
+      });
+  };
+
+  const filteredDestinations = getFilteredDestinations().filter(destination => 
     destination.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     destination.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -125,6 +416,9 @@ const ItineraryPlanner = () => {
       destinationId: destination.id,
       date: today.toISOString().split('T')[0],
       notes: '',
+      transportMode: 'car',
+      nights: 1,
+      days: 1
     };
     
     setItinerary([...itinerary, newItem]);
@@ -150,14 +444,80 @@ const ItineraryPlanner = () => {
       item.id === itemId ? { ...item, notes: newNotes } : item
     ));
   };
+
+  const handleUpdateTransportMode = (itemId: number, mode: 'car' | 'train' | 'bus' | 'plane') => {
+    setItinerary(itinerary.map(item => 
+      item.id === itemId ? { ...item, transportMode: mode } : item
+    ));
+  };
+
+  const handleUpdateDuration = (itemId: number, nights: number, days: number) => {
+    setItinerary(itinerary.map(item => 
+      item.id === itemId ? { ...item, nights, days } : item
+    ));
+  };
+
+  const calculateTotalCarbonFootprint = () => {
+    return itinerary.reduce((total, item) => {
+      const destination = getDestinationById(item.destinationId);
+      if (!destination) return total;
+
+      const source = stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity);
+      
+      let journeyCarbon = 0;
+      if (source) {
+        const distance = calculateDistance(
+          source.coordinates.lat,
+          source.coordinates.lng,
+          destination.coordinates.lat,
+          destination.coordinates.lng
+        );
+        journeyCarbon = calculateJourneyCarbon(distance, item.transportMode);
+      }
+
+      const accommodationCarbon = destination.carbonFootprint.accommodation * item.nights;
+      const activitiesCarbon = destination.carbonFootprint.activities * item.days;
+
+      return total + journeyCarbon + accommodationCarbon + activitiesCarbon;
+    }, 0);
+  };
   
   return (
     <div>
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="plan">Plan Your Route</TabsTrigger>
           <TabsTrigger value="destinations">Sustainable Destinations</TabsTrigger>
-          <TabsTrigger value="itinerary">My Itinerary ({itinerary.length})</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="plan">
+          <Card className="p-6 mb-6">
+            <CardHeader>
+              <CardTitle>Plan Your Sustainable Journey</CardTitle>
+              <CardDescription>Select your capital city to find sustainable destinations within reach</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="max-w-md mx-auto">
+                <CitySelector
+                  label="Select Your Capital City"
+                  value={sourceCity}
+                  onChange={setSourceCity}
+                />
+                {sourceCity && (
+                  <div className="mt-6">
+                    <Button 
+                      className="w-full bg-ecotopia-primary hover:bg-ecotopia-light"
+                      onClick={() => setActiveTab('destinations')}
+                    >
+                      <Navigation className="mr-2" size={16} />
+                      Find Sustainable Destinations
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
         <TabsContent value="destinations">
           <div className="mb-6">
@@ -178,6 +538,7 @@ const ItineraryPlanner = () => {
                 key={destination.id} 
                 destination={destination} 
                 onAddToItinerary={handleAddToItinerary}
+                sourceCity={sourceCity}
               />
             ))}
           </div>
@@ -236,6 +597,42 @@ const ItineraryPlanner = () => {
                               className="w-44 h-8 text-sm"
                             />
                           </div>
+
+                          <div className="mb-3 flex items-center gap-4">
+                            <div className="flex items-center">
+                              <label className="text-sm mr-2">Transport:</label>
+                              <select
+                                value={item.transportMode}
+                                onChange={(e) => handleUpdateTransportMode(item.id, e.target.value as any)}
+                                className="text-sm border rounded p-1"
+                              >
+                                <option value="car">Car</option>
+                                <option value="train">Train</option>
+                                <option value="bus">Bus</option>
+                                <option value="plane">Plane</option>
+                              </select>
+                            </div>
+                            <div className="flex items-center">
+                              <label className="text-sm mr-2">Nights:</label>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={item.nights}
+                                onChange={(e) => handleUpdateDuration(item.id, parseInt(e.target.value), item.days)}
+                                className="w-16 h-8 text-sm"
+                              />
+                            </div>
+                            <div className="flex items-center">
+                              <label className="text-sm mr-2">Days:</label>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={item.days}
+                                onChange={(e) => handleUpdateDuration(item.id, item.nights, parseInt(e.target.value))}
+                                className="w-16 h-8 text-sm"
+                              />
+                            </div>
+                          </div>
                           
                           <Input
                             placeholder="Add notes for this destination..."
@@ -251,12 +648,36 @@ const ItineraryPlanner = () => {
                               </span>
                             ))}
                           </div>
+
+                          <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                            <h4 className="text-sm font-medium text-green-800 mb-2">Carbon Footprint Breakdown:</h4>
+                            <div className="text-sm text-green-700">
+                              <p>Accommodation: {Math.round(destination.carbonFootprint.accommodation * item.nights)} kg CO2</p>
+                              <p>Activities: {Math.round(destination.carbonFootprint.activities * item.days)} kg CO2</p>
+                              <p>Transport: {Math.round(calculateJourneyCarbon(
+                                calculateDistance(
+                                  stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity)?.coordinates.lat || 0,
+                                  stateCapitals.find(city => `${city.name}, ${city.state}` === sourceCity)?.coordinates.lng || 0,
+                                  destination.coordinates.lat,
+                                  destination.coordinates.lng
+                                ),
+                                item.transportMode
+                              ))} kg CO2</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </Card>
                   );
                 })}
               
+              <div className="mt-6 p-4 bg-green-100 rounded-lg">
+                <h3 className="text-lg font-semibold text-green-800 mb-2">Total Carbon Footprint</h3>
+                <p className="text-2xl font-bold text-green-700">
+                  {Math.round(calculateTotalCarbonFootprint())} kg CO2
+                </p>
+              </div>
+
               <div className="flex justify-end mt-6">
                 <Button className="bg-ecotopia-primary hover:bg-ecotopia-light">
                   Save Itinerary
