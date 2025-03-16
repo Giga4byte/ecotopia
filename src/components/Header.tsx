@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -39,6 +38,9 @@ const Header = () => {
           <Link to="/carpool" className="text-ecotopia-dark hover:text-ecotopia-primary transition-colors">
             Carpooling
           </Link>
+          <Link to="/vendor" className="text-ecotopia-dark hover:text-ecotopia-primary transition-colors">
+            Eco Products
+          </Link>
           <Button className="bg-ecotopia-primary hover:bg-ecotopia-light text-white transition-colors">
             Sign Up
           </Button>
@@ -68,6 +70,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Carpooling
+              </Link>
+              <Link 
+                to="/vendor" 
+                className="text-ecotopia-dark hover:text-ecotopia-primary transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Eco Products
               </Link>
               <Button className="bg-ecotopia-primary hover:bg-ecotopia-light text-white transition-colors w-full">
                 Sign Up
