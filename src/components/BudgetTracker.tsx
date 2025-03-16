@@ -56,38 +56,38 @@ const EcoRatingBadge = ({ rating }: { rating: string }) => {
 
 const CATEGORY_ECO_RULES: Record<Category, (amount: number) => 1 | 2 | 3 | 4 | 5> = {
   'Transportation': (amount: number) => {
-    if (amount < 50) return 5;
-    if (amount < 100) return 4;
-    if (amount < 200) return 3;
-    if (amount < 500) return 2;
+    if (amount < 3750) return 5;    // < $50
+    if (amount < 7500) return 4;    // < $100
+    if (amount < 15000) return 3;   // < $200
+    if (amount < 37500) return 2;   // < $500
     return 1;
   },
   'Accommodation': (amount: number) => {
-    if (amount < 50) return 5;
-    if (amount < 100) return 4;
-    if (amount < 200) return 3;
-    if (amount < 400) return 2;
+    if (amount < 3750) return 5;    // < $50
+    if (amount < 7500) return 4;    // < $100
+    if (amount < 15000) return 3;   // < $200
+    if (amount < 30000) return 2;   // < $400
     return 1;
   },
   'Food & Dining': (amount: number) => {
-    if (amount < 20) return 5;
-    if (amount < 40) return 4;
-    if (amount < 80) return 3;
-    if (amount < 150) return 2;
+    if (amount < 1500) return 5;    // < $20
+    if (amount < 3000) return 4;    // < $40
+    if (amount < 6000) return 3;    // < $80
+    if (amount < 11250) return 2;   // < $150
     return 1;
   },
   'Activities & Entertainment': (amount: number) => {
-    if (amount < 30) return 5;
-    if (amount < 60) return 4;
-    if (amount < 100) return 3;
-    if (amount < 200) return 2;
+    if (amount < 2250) return 5;    // < $30
+    if (amount < 4500) return 4;    // < $60
+    if (amount < 7500) return 3;    // < $100
+    if (amount < 15000) return 2;   // < $200
     return 1;
   },
   'Shopping': (amount: number) => {
-    if (amount < 50) return 5;
-    if (amount < 100) return 4;
-    if (amount < 200) return 3;
-    if (amount < 500) return 2;
+    if (amount < 3750) return 5;    // < $50
+    if (amount < 7500) return 4;    // < $100
+    if (amount < 15000) return 3;   // < $200
+    if (amount < 37500) return 2;   // < $500
     return 1;
   },
   'Miscellaneous': () => 3
@@ -438,7 +438,7 @@ const BudgetTracker = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Spent</p>
-                <p className="text-2xl font-bold text-gray-800">${totalSpent.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-800">₹{totalSpent.toFixed(2)}</p>
               </div>
             </div>
             
@@ -448,7 +448,7 @@ const BudgetTracker = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Remaining</p>
-                <p className="text-2xl font-bold text-gray-800">${remaining.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-800">₹{remaining.toFixed(2)}</p>
               </div>
             </div>
             
@@ -488,7 +488,7 @@ const BudgetTracker = () => {
                         />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `$${value}`} />
+                    <Tooltip formatter={(value) => `₹${value}`} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -501,7 +501,7 @@ const BudgetTracker = () => {
                   <div key={budget.category}>
                     <div className="flex justify-between text-sm mb-1">
                       <span>{budget.category}</span>
-                      <span>${budget.spent.toFixed(2)} / ${budget.limit.toFixed(2)}</span>
+                      <span>₹{budget.spent.toFixed(2)} / ₹{budget.limit.toFixed(2)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -541,7 +541,7 @@ const BudgetTracker = () => {
                         <tr key={transaction.id} className="border-b hover:bg-gray-50">
                           <td className="py-3 px-4">{transaction.date}</td>
                           <td className="py-3 px-4">{transaction.category}</td>
-                          <td className="py-3 px-4">${transaction.amount.toFixed(2)}</td>
+                          <td className="py-3 px-4">₹{transaction.amount.toFixed(2)}</td>
                           <td className="py-3 px-4">{transaction.paymentMethod}</td>
                           <td className="py-3 px-4">
                             <div className="flex items-center">
